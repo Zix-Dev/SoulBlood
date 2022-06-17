@@ -1,12 +1,7 @@
 package Model;
 
-import Graphics.Sprite.Sprite;
-import Graphics.TileSet;
 import Model.Physics.Body;
 import Util.PostLoadable;
-import View.Camera;
-
-import java.awt.*;
 
 public class TileMap implements PostLoadable {
 

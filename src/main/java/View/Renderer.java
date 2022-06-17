@@ -1,6 +1,8 @@
 package View;
 
-import Model.TileMap;
+import Graphics.Sprite.Sprite;
+import Model.Camera;
+import Model.Level;
 import Graphics.TileSet;
 
 import java.awt.*;
@@ -8,18 +10,25 @@ import java.awt.image.BufferStrategy;
 
 public class Renderer extends Canvas {
 
-    public TileMap map;
-    public TileSet tileSet;
-    private final Camera camera = new Camera(0, 0, 17, 10);
-    boolean renderColliders = true;
-    boolean renderMapCoordinates = true;
-    boolean renderCamera = true;
-    private float scale = 1.75f;
+    //Attributes
 
-    public Renderer(TileMap map, TileSet tileSet) {
-        this.map = map;
+    public Level level;
+    public TileSet tileSet;
+    public final Camera camera = new Camera(17, 10);
+    boolean renderColliders = false;
+    boolean renderMapCoordinates = false;
+    boolean renderCamera = false;
+    private float scale = 1.75f;
+    private Graphics2D g;
+
+    //Constructor
+
+    public Renderer(Level level, TileSet tileSet) {
+        this.level = level;
         this.tileSet = tileSet;
     }
+
+    //Overriden Mehods
 
     @Override
     public void update(Graphics g) {
@@ -47,15 +56,20 @@ public class Renderer extends Canvas {
         }
     }
 
+    //Render
+
     public void render() {
         this.setSize((int) (camera.width * scale * tileSet.size), (int) (camera.height * scale * tileSet.size));
-        var g = getGraphics();
-        g.setColor(Color.DARK_GRAY);
-        g.fillRect(0, 0, getWidth(), getHeight());
-        renderMap(g);
-        if (renderMapCoordinates) renderMapCoordinates(g);
-        if (renderColliders) renderMapColliders(g);
-        if (renderCamera) renderCamera(g);
+        g = getGraphics();
+        fill(Color.DARK_GRAY);
+        renderMap();
+        renderObjects();
+        if (renderMapCoordinates) renderMapCoordinates();
+        if (renderColliders) {
+            renderMapColliders();
+            renderObjectColliders();
+        }
+        if (renderCamera) renderCamera();
         g.dispose();
         try {
             getBufferStrategy().show();
@@ -63,72 +77,106 @@ public class Renderer extends Canvas {
         }
     }
 
-    private void renderCamera(Graphics2D g) {
+    //Render methods
+
+    private void renderObjects() {
+        for (var o : level.getAllObjects()) {
+            drawImage(tileSet.tiles[6], o.body.x, o.body.y);
+        }
+    }
+
+    private void renderCamera() {
         g.setColor(Color.blue);
         g.setStroke(new BasicStroke(5));
-        var s = scale*tileSet.size;
-        g.drawRect(0,0, (int) (camera.width*s)-1, (int) (camera.height*s)-1);
+        var s = scale * tileSet.size;
+        g.drawRect(0, 0, (int) (camera.width * s) - 1, (int) (camera.height * s) - 1);
         g.setStroke(new BasicStroke(1));
-        g.drawLine((int) (camera.width/2*s+s/7), (int) (camera.height/2*s), (int) (camera.width/2*s-s/7), (int) (camera.height/2*s));
-        g.drawLine((int) (camera.width/2*s),(int) (camera.height/2*s+s/7), (int) (camera.width/2*s), (int) (camera.height/2*s-s/7));
+        g.drawLine((int) (camera.width / 2 * s + s / 7), (int) (camera.height / 2 * s), (int) (camera.width / 2 * s - s / 7), (int) (camera.height / 2 * s));
+        g.drawLine((int) (camera.width / 2 * s), (int) (camera.height / 2 * s + s / 7), (int) (camera.width / 2 * s), (int) (camera.height / 2 * s - s / 7));
     }
 
-    private void renderMap(Graphics2D g) {
-        int posX, posY, tile;
-        float s = scale * tileSet.size;
-        for (int x = (int) (camera.x - camera.width / 2); x < map.width && x < camera.x + camera.width / 2; x++) {
-            if (x < 0) continue;
-            for (int y = (int) (camera.y - camera.height / 2); y < map.height && y < camera.y + camera.height / 2; y++) {
-                if (y < 0) continue;
-                for (int z = 0; z < map.layerCount; z++) {
-                    tile = map.layers[z][y][x];
+    private void renderMap() {
+        int tile;
+        for (int x = 0; x < level.map.width; x++) {
+            for (int y = 0; y < level.map.height; y++) {
+                for (int z = 0; z < level.map.layerCount; z++) {
+                    tile = level.map.layers[z][y][x];
                     if (tile < 0) continue;
-                    posX = (int) ((x - camera.x + camera.width / 2) * s);
-                    posY = (int) ((y - camera.y + camera.height / 2) * s);
-                    g.drawImage(tileSet.tiles[tile], posX, posY, (int) s, (int) s, null);
+                    drawTile(tile, x, y);
                 }
             }
         }
     }
 
-    private void renderMapCoordinates(Graphics2D g) {
-        int posX, posY;
-        var c = new Color(0,255,0,10);
-        float s = scale * tileSet.size;
-        for (int x = (int) (camera.x - camera.width / 2); x < map.width && x < camera.x + camera.width / 2; x++) {
-            if (x < 0) continue;
-            for (int y = (int) (camera.y - camera.height / 2); y < map.height && y < camera.y + camera.height / 2; y++) {
-                if (y < 0) continue;
-                for (int z = 0; z < map.layerCount; z++) {
-                    posX = (int) ((x - camera.x + camera.width / 2) * s);
-                    posY = (int) ((y - camera.y + camera.height / 2) * s);
-                    g.setColor(c);
-                    g.drawRect(posX, posY, (int) s, (int) s);
-                    g.setColor(Color.green);
-                    g.drawString(x+", "+y, posX+5, posY+14);
-                }
+    private void renderMapCoordinates() {
+        g.setColor(new Color(50, 110, 50));
+        for (int x = 0; x < level.map.width; x++) {
+            drawLine(x, 0, x, level.map.height);
+            for (int y = 0; y < level.map.height; y++) {
+                g.drawString(x + ", " + y, relX(x) + scale * 2, relY(y) + scale * 8);
             }
+        }
+        for (int x = 0; x < level.map.width + 1; x++) drawLine(x, 0, x, level.map.height);
+        for (int y = 0; y < level.map.height + 1; y++) drawLine(0, y, level.map.width, y);
+    }
+
+    public void renderObjectColliders() {
+        g.setColor(Color.magenta);
+        for (var o : level.getAllObjects()) {
+            drawBox(o.body.x, o.body.y, o.body.width, o.body.height);
         }
     }
 
-    public void renderMapColliders(Graphics2D g) {
+    public void renderMapColliders() {
         g.setColor(Color.red);
-        g.setStroke(new BasicStroke(2));
-        var s = scale*tileSet.size;
-        for (var c : map.colliders) {
-            var posX = (int) ((c.x - camera.x + camera.width / 2) * s);
-            var posY = (int) ((c.y - camera.y + camera.height / 2) * s);
-            g.fillOval(posX-3, posY-3, 6,6);
-            g.drawRect((int) (posX-c.width/2*s), (int) (posY-c.height/2*s), (int) (c.width*s), (int) (c.height*s));
+        for (var c : level.map.colliders) {
+            drawBox(c.x, c.y, c.width, c.height);
         }
     }
 
-    public void setCameraPosition(float x, float y) {
-        this.camera.x = x;
-        this.camera.y = y;
+    //Draw(relative to camera) methods
+
+    public void fill(Color c) {
+        g.setColor(c);
+        g.fillRect(0, 0, this.getWidth(), this.getHeight());
     }
 
-    public float[] getCameraPosition() {
-        return new float[]{camera.x, camera.y};
+    public void drawImage(Sprite sprite, float x, float y) {
+        g.drawImage(sprite, (int) (relX(x) - relSize(0.5f)), (int) (relY(y) - relSize(0.5f)), (int) (sprite.width * scale), (int) (sprite.height * scale), null);
     }
+
+    public void drawTile(int tile, float x, float y) {
+        g.drawImage(tileSet.tiles[tile], (int) relX(x), (int) relY(y), (int) (tileSet.size * scale), (int) (tileSet.size * scale), null);
+    }
+
+    public void drawRect(float x, float y, float w, float h) {
+        g.drawRect((int) (relX(x) - relSize(w) / 2f), (int) (relY(y) - relSize(h) / 2f), (int) relSize(w), (int) relSize(h));
+    }
+
+    public void drawLine(float x, float y, float x2, float y2) {
+        g.drawLine((int) relX(x), (int) relY(y), (int) relX(x2), (int) relY(y2));
+    }
+
+    public void drawBox(float x, float y, float w, float h) {
+        g.setStroke(new BasicStroke(2));
+        drawRect(x, y, w, h);
+        g.setStroke(new BasicStroke(1));
+        drawLine(x - w / 2f, y - h / 2f, x + w / 2f, y + h / 2f);
+        drawLine(x - w / 2f, y + h / 2f, x + w / 2f, y - h / 2f);
+    }
+
+    //Relative units parsers
+
+    private float relX(float x) {
+        return ((x - camera.left()) * scale * tileSet.size);
+    }
+
+    private float relY(float y) {
+        return ((y - camera.top()) * scale * tileSet.size);
+    }
+
+    private float relSize(float w) {
+        return w * scale * tileSet.size;
+    }
+
 }
