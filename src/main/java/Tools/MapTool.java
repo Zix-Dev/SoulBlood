@@ -1,35 +1,56 @@
 package Tools;
 
-import Graphics.TileSet;
+import Model.Physics.Body;
 import Model.TileMap;
-import Util.Csv;
 import Util.Json;
-import com.google.gson.Gson;
-import com.opencsv.CSVReader;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
 
-import java.io.*;
+import javax.swing.*;
+import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class MapTool {
-    public static void main(String[] args) throws Exception {
-        Scanner input = new Scanner(System.in);
-        System.out.println("Write map dir path:");
-        var path = input.nextLine();
-        var dirs = path.replace('\\', '/').split("/");
-        var dirName = dirs[dirs.length-1];
-        String[] files = new File(path).list();
-        var layers = new ArrayList<int[][]>();
-        assert files != null;
-        for (var file : files) if (file.endsWith(".csv")) {
-            layers.add(Csv.readInts(path + "/" + file));
-        }
-        System.out.println("Write the tileset path: ");
-        var tsPath = input.nextLine();
-        System.out.println("Write the tile size: ");
-        var tileSize = Integer.parseInt(input.nextLine());
-        var newPath = path + '/' + dirName + ".json";
-        Json.write(new TileMap(layers.toArray(new int[0][][]), new TileSet(tsPath, tileSize)), newPath);
-    }
 
+    public static void main(String[] args) throws Exception {
+        JFileChooser fc = new JFileChooser("src/main/resources/Maps");
+        fc.showOpenDialog(new JDialog());
+        var path = fc.getSelectedFile().getPath();
+        var b = new GsonBuilder();
+        b.registerTypeAdapter(TileMap.class, (JsonDeserializer<TileMap>) (jsonElement, type, jsonDeserializationContext) -> {
+            ArrayList<int[][]> layers = new ArrayList<>();
+            ArrayList<Body> colliders = new ArrayList<>();
+            var jo = jsonElement.getAsJsonObject();
+            var jlayers = jo.get("layers").getAsJsonArray();
+            for (var l : jlayers) {
+                String layerType = l.getAsJsonObject().get("type").getAsString();
+                if (layerType.equals("tilelayer")) {
+                    var a = l.getAsJsonObject().get("data");
+                    var w = l.getAsJsonObject().get("width").getAsInt();
+                    var c =(int[]) jsonDeserializationContext.deserialize(a.getAsJsonArray(), int[].class);
+                    var d = new int[c.length/w][w];
+                    for (int i = 0; i < c.length; i++) {
+                        d[i/w][i%w] = c[i]-1;
+                    }
+                    layers.add(d);
+                } else if (layerType.equals("objectgroup")){
+                    var as = l.getAsJsonObject().get("objects").getAsJsonArray();
+                    for (var a : as) {
+                        var w = a.getAsJsonObject().get("width").getAsInt();
+                        var h = a.getAsJsonObject().get("height").getAsInt();
+                        var x = a.getAsJsonObject().get("x").getAsInt();
+                        var y = a.getAsJsonObject().get("y").getAsInt();
+                        colliders.add(new Body(x/32f,y/32f,w/32f,h/32f));
+                    }
+                }
+            }
+            return new TileMap(layers.toArray(new int[0][][]), colliders.toArray(new Body[0]));
+        });
+        var gson = b.create();
+        var fr = new FileReader(path);
+        var tm = gson.fromJson(fr, TileMap.class);
+        fr.close();
+        Json.write(tm, path);
+        System.exit(0);
+    }
 }

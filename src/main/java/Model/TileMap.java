@@ -1,36 +1,35 @@
 package Model;
 
-import Graphics.TileSet;
+import Model.Physics.Body;
 import Util.PostLoadable;
-
-import java.awt.*;
 
 public class TileMap implements PostLoadable {
 
     public int[][][] layers;
-    public TileSet tileSet;
+    public Body[] colliders;
+    public transient int layerCount, width, height;
 
-    public TileMap(int[][][] layers, TileSet tileSet) {
+    public TileMap(int[][][] layers, Body[] colliders) {
         this.layers = layers;
-        this.tileSet = tileSet;
+        this.colliders = colliders;
     }
 
+    @Override
     public void load() {
-        tileSet.load();
+        layerCount = layers.length;
+        height = layers[0].length;
+        width = layers[0][0].length;
     }
 
-    public void draw(Graphics g) {
-        int tile;
-        for (int z = 0; z < layers.length; z++) {
-            for (int y = 0; y < layers[z].length; y++) {
-                for (int x = 0; x < layers[z][y].length; x++) {
-                    tile = layers[z][y][x];
-                    if (tile == -1) continue;
-                    g.drawImage(tileSet.tiles[tile], x * tileSet.tileSize, y * tileSet.tileSize, null);
-                }
-            }
+    public static class MapCollider {
+        public float x, y, width, height;
+
+        public MapCollider(float x, float y, float width, float height) {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
         }
-        g.dispose();
     }
 
 }

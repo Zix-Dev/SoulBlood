@@ -24,12 +24,17 @@ public class Sprite extends BufferedImage {
     }
 
     public Sprite[][] trim(int width, int height) {
-        int rows = (getHeight() + height - 1) / height;
-        int cols = (getWidth() + width - 1) / width;
-        var sprites = new Sprite[cols][rows];
-        for (int x = 0; x < sprites.length; x++) for (int y = 0; y < sprites[x].length; y++) {
-            sprites[x][y] = new Sprite(getSubimage(x*width, y*height, width, height));
-        }
+        int rows = (this.height + height - 1) / height;
+        int cols = (this.width + width - 1) / width;
+        var sprites = new Sprite[rows][cols];
+        var a = new int[rows][cols];
+        int i = 1;
+        for (int x = 0; x < rows; x++)
+            for (int y = 0; y < cols; y++) {
+                sprites[x][y] = new Sprite(getSubimage(y*width,x*height,width,height));
+                a[x][y] = i;
+                i++;
+            }
         return sprites;
     }
 

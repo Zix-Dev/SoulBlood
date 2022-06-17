@@ -12,17 +12,18 @@ public class TileSet implements PostLoadable {
 
     public transient Sprite[] tiles;
     public String path;
-    public int tileSize;
+    public int size;
 
     public TileSet(String path, int tileSize) {
         this.path = path;
-        this.tileSize = tileSize;
+        this.size = tileSize;
+        load();
     }
 
     public void load() {
         try {
             var img = ImageIO.read(new File(path));
-            this.tiles = new SpriteSheet(img, tileSize, tileSize).getSpriteArray();
+            this.tiles = new SpriteSheet(img, size, size).getSpriteArray();
         } catch (IOException e) {
             e.printStackTrace();
         }
