@@ -36,11 +36,11 @@ public class MapTool {
                 } else if (layerType.equals("objectgroup")){
                     var as = l.getAsJsonObject().get("objects").getAsJsonArray();
                     for (var a : as) {
-                        var w = a.getAsJsonObject().get("width").getAsInt();
-                        var h = a.getAsJsonObject().get("height").getAsInt();
-                        var x = a.getAsJsonObject().get("x").getAsInt();
-                        var y = a.getAsJsonObject().get("y").getAsInt();
-                        colliders.add(new Body(x/32f,y/32f,w/32f,h/32f));
+                        var w = a.getAsJsonObject().get("width").getAsInt()/32f;
+                        var h = a.getAsJsonObject().get("height").getAsInt()/32f;
+                        var x = a.getAsJsonObject().get("x").getAsInt()/32f;
+                        var y = a.getAsJsonObject().get("y").getAsInt()/32f;
+                        colliders.add(new Body(x+w/2,y+h/2,w,h));
                     }
                 }
             }

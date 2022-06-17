@@ -37,27 +37,18 @@ public class Demo {
     }
 
     public static void main(String[] args) throws Exception {
-        while (true) {
-            float x = keyInput.get(VK_A)?-0.02f:0;
-            x += keyInput.get(VK_D)?0.02f:0;
-            float y = keyInput.get(VK_W)?-0.02f:0;
-            y += keyInput.get(VK_S)?0.02f:0;
-            renderer.setCamX(renderer.getCamX()+x);
-            renderer.setCamY(renderer.getCamY()+y);
-            renderer.draw();
-            sleep(1);
-        }
+        tilemap();
     }
 
     public static void tilemap() throws Exception{
         while (true) {
-            float x = keyInput.get(VK_A)?-0.02f:0;
-            x += keyInput.get(VK_D)?0.02f:0;
-            float y = keyInput.get(VK_W)?-0.02f:0;
-            y += keyInput.get(VK_S)?0.02f:0;
-            renderer.setCamX(renderer.getCamX()+x);
-            renderer.setCamY(renderer.getCamY()+y);
-            renderer.draw();
+            float x = keyInput.get(VK_A)?-0.1f:0;
+            x += keyInput.get(VK_D)?0.1f:0;
+            float y = keyInput.get(VK_W)?-0.1f:0;
+            y += keyInput.get(VK_S)?0.1f:0;
+            renderer.setCameraPosition(renderer.getCameraPosition()[0]+x, renderer.getCameraPosition()[1]+y);
+            renderer.render();
+            sleep(20);
         }
     }
 
