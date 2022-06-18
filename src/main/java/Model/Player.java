@@ -1,5 +1,7 @@
 package Model;
 
+import static Model.Physics.PhysicsConstants.SPEED;
+
 public class Player extends GameObject {
 
     public Player(Model.Physics.Body body) {
@@ -13,15 +15,14 @@ public class Player extends GameObject {
             float x, y, deltaX, deltaY;
             x = body.getX();
             y = body.getY();
-            deltaY = input.up ? -0.1f : 0;
-            deltaY += input.down ? 0.1f : 0;
-            deltaX = input.right ? -0.1f : 0;
-            deltaX += input.left ? 0.1f : 0;
+            deltaY = input.up ? -SPEED : 0;
+            deltaY += input.down ? SPEED : 0;
+            deltaX = input.right ? -SPEED : 0;
+            deltaX += input.left ? SPEED : 0;
+            sprite = x < body.getX() ? 6 : (x > body.getX()) ? 7 : sprite;
             body.move(x+deltaX, y+deltaY);
-            if (levelContext.collides(this)) {
-                body.setX(x);
-                body.setY(y);
-            }
+            var otherBody = levelContext.collides(this.body);
+            if (otherBody != null) body.move(x,y);
         }
     }
 

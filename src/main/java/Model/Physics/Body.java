@@ -59,7 +59,12 @@ public class Body {
   }
 
   public boolean collides(Body body) {
-    return getRect().intersects(body.getRect());
+    if (body == this) return false;
+    if (left() > body.right() || body.left() > right())
+      return false;
+    if (top() > body.bottom() || body.top() > bottom())
+      return false;
+    return true;
   }
 
   public float right() {
@@ -77,4 +82,21 @@ public class Body {
   public float bottom() {
     return y0 +height;
   }
+
+  public void setRight(float x) {
+    this.x0 = x - width;
+  }
+
+  public void setLeft(float x) {
+    this.x0 = x + width;
+  }
+
+  public void setTop(float y) {
+    this.y0 = y - height;
+  }
+
+  public void setBottom(float y) {
+    this.y0 = y + height;
+  }
+
 }

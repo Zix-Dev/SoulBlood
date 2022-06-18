@@ -16,8 +16,8 @@ public class Renderer extends Canvas {
     public Level level;
     public TileSet tileSet;
     public final Camera camera;
-    private boolean renderColliders = false;
-    private boolean renderMapCoordinates = true;
+    private boolean renderColliders = true;
+    private boolean renderMapCoordinates = false;
     private boolean renderCamera = false;
     public ParallaxBackground parallaxBackground = null;
     private float scale = 1.75f;
@@ -90,7 +90,7 @@ public class Renderer extends Canvas {
 
     private void renderObjects() {
         for (var o : level.getAllObjects()) {
-            drawImage(tileSet.tiles[6], o.body.getX(), o.body.getY());
+            drawImage(tileSet.tiles[o.sprite], o.body.getX(), o.body.getY());
         }
     }
 
@@ -167,9 +167,7 @@ public class Renderer extends Canvas {
     }
 
     public void drawBox(float x, float y, float w, float h) {
-        g.setStroke(new BasicStroke(2));
         drawRect(x, y, w, h);
-        g.setStroke(new BasicStroke(1));
         drawLine(x - w / 2f, y - h / 2f, x + w / 2f, y + h / 2f);
         drawLine(x - w / 2f, y + h / 2f, x + w / 2f, y - h / 2f);
     }

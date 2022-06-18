@@ -1,9 +1,7 @@
 package Util;
 
-import Model.Physics.Body;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -15,13 +13,7 @@ public abstract class Json {
     static {
         var builder = new GsonBuilder();
         builder.setPrettyPrinting();
-        builder.registerTypeAdapter(Body.class, (JsonDeserializer<Body>) (jsonElement, type, jsonDeserializationContext)
-                -> {
-            var b = jsonElement.getAsJsonObject();
-            return new Body(b.get("x").getAsFloat(),
-                    b.get("y").getAsFloat(),
-                    b.get("width").getAsFloat(),
-                    b.get("height").getAsFloat());});
+
         gson = builder.create();
     }
 

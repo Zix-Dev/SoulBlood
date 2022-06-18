@@ -46,6 +46,14 @@ public class MapTool {
             }
             return new TileMap(layers.toArray(new int[0][][]), colliders.toArray(new Body[0]));
         });
+        b.registerTypeAdapter(Body.class, (JsonDeserializer<Body>) (jsonElement, type, jsonDeserializationContext)
+                -> {
+            var bj = jsonElement.getAsJsonObject();
+            return new Body(bj.get("x").getAsFloat(),
+                    bj.get("y").getAsFloat(),
+                    bj.get("width").getAsFloat(),
+                    bj.get("height").getAsFloat());
+        });
         var gson = b.create();
         var fr = new FileReader(path);
         var tm = gson.fromJson(fr, TileMap.class);

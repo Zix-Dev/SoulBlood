@@ -28,7 +28,7 @@ public class ParallaxBackground extends Sprite {
         g.drawImage(bottomLayer, 0, 0, null);
         float xOffset, yOffset;
         for (var layer : layers) {
-            xOffset = -x / layer.distance % layer.width;
+            xOffset = x / layer.distance % layer.width;
             yOffset = (y < 0) ? 0 : y / layer.distance;
             for (float i = xOffset - layer.width; i < this.width; i += layer.width)
                 g.drawImage(layer, (int) i, (int) yOffset, null);

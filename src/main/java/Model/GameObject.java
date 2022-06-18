@@ -6,6 +6,7 @@ public class GameObject {
 
     public Input input = null;
     public Body body;
+    public int sprite = 7;
     public Level levelContext = null;
 
     public GameObject(Body body) {

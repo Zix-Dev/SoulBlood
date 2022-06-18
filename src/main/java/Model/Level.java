@@ -1,5 +1,7 @@
 package Model;
 
+import Model.Physics.Body;
+
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -42,16 +44,13 @@ public class Level {
         return objects.toArray(new GameObject[0]);
     }
 
-    public boolean collides(GameObject o) {
+    public Body collides(Body b) {
         for (var o2 : map.colliders) {
-            if (o.body.collides(o2))
-                return true;
+            if (b.collides(o2)) return o2;
         }
         for (var o2 : objects) {
-            if (o2 == o) continue;
-            if (o.body.collides(o2.body))
-                return true;
+            if (b.collides(o2.body)) return o2.body;
         }
-        return false;
+        return null;
     }
 }
