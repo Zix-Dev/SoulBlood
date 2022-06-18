@@ -1,10 +1,10 @@
 package View;
 
-import Graphics.Sprite.Sprite;
-import Graphics.ParallaxBackground;
+import GraphicObjects.Sprite.Sprite;
+import GraphicObjects.ParallaxBackground;
 import Model.Camera;
 import Model.Level;
-import Graphics.TileSet;
+import GraphicObjects.TileSet;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
@@ -15,9 +15,9 @@ public class Renderer extends Canvas {
 
     public Level level;
     public TileSet tileSet;
-    public final Camera camera = new Camera(17, 10);
+    public final Camera camera;
     private boolean renderColliders = false;
-    private boolean renderMapCoordinates = false;
+    private boolean renderMapCoordinates = true;
     private boolean renderCamera = false;
     public ParallaxBackground parallaxBackground = null;
     private float scale = 1.75f;
@@ -25,9 +25,10 @@ public class Renderer extends Canvas {
 
     //Constructor
 
-    public Renderer(Level level, TileSet tileSet) {
+    public Renderer(Level level, TileSet tileSet, Camera camera) {
         this.level = level;
         this.tileSet = tileSet;
+        this.camera = camera;
     }
 
     //Overriden Mehods
@@ -83,13 +84,13 @@ public class Renderer extends Canvas {
     //Render methods
 
     private void renderBackground() {
-        parallaxBackground.setPosition(camera.x(), camera.y());
+        parallaxBackground.setPosition(level.map.width-camera.right(), level.map.height-camera.bottom());
         g.drawImage(parallaxBackground,0,0, (int) relSize(camera.width), (int) relSize(camera.height), null);
     }
 
     private void renderObjects() {
         for (var o : level.getAllObjects()) {
-            drawImage(tileSet.tiles[6], o.body.x, o.body.y);
+            drawImage(tileSet.tiles[6], o.body.getX(), o.body.getY());
         }
     }
 
@@ -131,14 +132,14 @@ public class Renderer extends Canvas {
     public void renderObjectColliders() {
         g.setColor(Color.magenta);
         for (var o : level.getAllObjects()) {
-            drawBox(o.body.x, o.body.y, o.body.width, o.body.height);
+            drawBox(o.body.getX(), o.body.getY(), o.body.width, o.body.height);
         }
     }
 
     public void renderMapColliders() {
         g.setColor(Color.red);
         for (var c : level.map.colliders) {
-            drawBox(c.x, c.y, c.width, c.height);
+            drawBox(c.getX(), c.getY(), c.width, c.height);
         }
     }
 

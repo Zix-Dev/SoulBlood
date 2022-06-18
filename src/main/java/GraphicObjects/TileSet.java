@@ -1,7 +1,7 @@
-package Graphics;
+package GraphicObjects;
 
-import Graphics.Sprite.Sprite;
-import Graphics.Sprite.SpriteSheet;
+import GraphicObjects.Sprite.Sprite;
+import GraphicObjects.Sprite.SpriteSheet;
 import Util.PostLoadable;
 
 import javax.imageio.ImageIO;

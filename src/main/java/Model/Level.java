@@ -6,18 +6,21 @@ import java.util.Queue;
 public class Level {
 
     public TileMap map;
+    public final Camera camera;
     private final LinkedList<GameObject> objects = new LinkedList<>();
     private final Queue<GameObject> addQueue = new LinkedList<>();
     private final Queue<GameObject> removeQueue = new LinkedList<>();
 
-    public Level(TileMap map) {
+    public Level(TileMap map, Camera camera) {
         this.map = map;
+        this.camera = camera;
     }
 
     public void update() {
         for (GameObject o : objects) o.update();
         while (!removeQueue.isEmpty()) objects.remove(removeQueue.poll());
         while (!addQueue.isEmpty()) objects.add(addQueue.poll());
+        camera.update();
     }
 
     public void add(GameObject o) {

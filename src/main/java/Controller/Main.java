@@ -1,9 +1,10 @@
 package Controller;
 
-import Graphics.Sprite.Sprite;
-import Graphics.Sprite.SpriteSheet;
-import Graphics.TileSet;
-import Graphics.ParallaxBackground;
+import GraphicObjects.ParallaxBackground;
+import GraphicObjects.Sprite.Sprite;
+import GraphicObjects.Sprite.SpriteSheet;
+import GraphicObjects.TileSet;
+import Model.Camera;
 import Model.GameObject.Input;
 import Model.Level;
 import Model.Physics.Body;
@@ -26,28 +27,26 @@ import static java.awt.event.KeyEvent.*;
  *  -Body Collisions
  *  -Tileset custom trimmer
  *  -Tileset collision box definition
- *  -Implement with parallax
  *  -Design assets
- *  -Try postprocessing with not static blocks
- *  -g.equals(getGraphics());
  */
 public abstract class Main {
 
     public static JFrame window = new JFrame("SoulBlood");
     public static Level testLevel;
     public static Player player;
+    public static Camera camera = new Camera(18,10);
     public static Renderer renderer;
     public static KeyInput keyInput = new KeyInput();
     public static Input playerInput = new Input();
     static {
         System.setProperty("sun.awt.noerasebackground", "true");
         TileMap tileMap = Json.read("src/main/resources/Maps/Test/Test.json", TileMap.class);
-        testLevel = new Level(tileMap);
+        testLevel = new Level(tileMap, camera);
         player = new Player(new Body(0.5f, 0.5f, 1, 1));
         player.input = playerInput;
         testLevel.add(player);
         TileSet tileSet = new TileSet("src/main/resources/Assets/TileSets/test.png", 32);
-        renderer = new Renderer(testLevel, tileSet);
+        renderer = new Renderer(testLevel, tileSet, camera);
         renderer.camera.track(player.body);
         renderer.addKeyListener(keyInput);
         Sprite[] parallaxLayers = null;
@@ -55,7 +54,7 @@ public abstract class Main {
             parallaxLayers = new SpriteSheet(ImageIO.read(new File("src/main/resources/Assets/Backgrounds/BlueMountains.png")), 500, 500).getSpriteArray();
         } catch (IOException ignored) {}
         assert parallaxLayers != null;
-        renderer.camera.setLimits(0,tileMap.width, 0, tileMap.height);
+        //renderer.camera.setLimits(0,tileMap.height, 0, tileMap.width);
         renderer.parallaxBackground = new ParallaxBackground(parallaxLayers[0], Arrays.copyOfRange(parallaxLayers, 1, 5), new float[]{0.7f,0.4f,0.2f,0.1f});
         window.add(renderer);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

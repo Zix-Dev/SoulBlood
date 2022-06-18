@@ -1,4 +1,4 @@
-package Graphics.Sprite;
+package GraphicObjects.Sprite;
 
 import java.awt.image.BufferedImage;
 

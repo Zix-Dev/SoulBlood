@@ -2,46 +2,20 @@ package Model;
 
 import Model.Physics.Body;
 
+import static Model.GameConstants.*;
+
 public class Camera {
 
-    private float x, y;
+    private float x0, y0;
     public final float width, height;
     private Body target = null;
-    private Float minX = null;
-    private Float maxX = null;
-    private Float minY = null;
-    private Float maxY = null;
+    private final Float[] limits = new Float[4]; //Top, bottom, left, right
 
     public Camera(float width, float height) {
         this.width = width;
         this.height = height;
-        this.x = width / 2f;
-        this.y = height / 2f;
-    }
-
-    public void move(float posX, float posY) {
-        if (minX != null && posX < minX) posX = minX;
-        else if (maxX != null && posX > maxX) posX = maxX;
-        if (minY != null && posY < minY) posY = minY;
-        else if (maxY != null && posY > maxY) posY = maxY;
-        this.x = posX;
-        this.y = posY;
-    }
-
-    public float getWidth() {
-        return width;
-    }
-
-    public void setLimits(float minX, float maxX, float minY, float maxY) {
-        if (minX > maxX || minY > maxX) throw new IllegalArgumentException("A min can't be greater then a max");
-        this.minX = minX;
-        this.maxX = maxX;
-        this.minY = minY;
-        this.maxY = maxY;
-    }
-
-    public float[] getLimits() {
-        return new float[]{minX, maxX, minY, maxY};
+        this.x0 = 0;
+        this.y0 = 0;
     }
 
     public void track(Body b) {
@@ -57,33 +31,43 @@ public class Camera {
     }
 
     public float x() {
-        var posX = (target == null) ? x : target.x;
-        if (minX != null && posX < minX) posX = minX;
-        else if (maxX != null && posX > maxX) posX = maxX;
-        return posX;
+        return x0 + width/2f;
     }
 
     public float y() {
-        var posY = (target == null) ? y : target.y;
-        if (minY != null && posY < minY) posY = minY;
-        else if (maxY != null && posY > maxY) posY = maxY;
-        return posY;
+        return y0 + height / 2f;
     }
 
-    public float right() {
-        return x() + (width / 2f);
+    public float top() {return y0;}
+    public float bottom() {return y0 +height;}
+    public float left() {return x0;}
+    public float right() {return x0 + width;}
+
+    public void setLimits(float top, float bottom, float left, float right) {
+        if (top+height > bottom || left + width > right)
+            throw new IllegalArgumentException("Camera size have no space");
+        limits[TOP] = top;
+        limits[BOTTOM]= bottom;
+        limits[LEFT] = left;
+        limits[RIGHT] = right;
     }
 
-    public float left() {
-        return x() - (width / 2f);
+    public Float[] getLimits() {
+        return limits;
     }
 
-    public float top() {
-        return y() - (height / 2f);
+    public void move(float x, float y)  {
+        x -= width/2;
+        y -= height/2;
+        if (limits[LEFT] != null && x < limits[LEFT]) x = limits[LEFT];
+        if (limits[RIGHT] != null && x + width > limits[RIGHT]) x = limits[RIGHT]-width;
+        if (limits[TOP] != null && y < limits[TOP]) y = limits[TOP];
+        if (limits[BOTTOM] != null && y + height > limits[BOTTOM]) y = limits[BOTTOM] - height;
+        this.x0 = x;
+        this.y0 = y;
     }
 
-    public float bottom() {
-        return y() + (height / 2f);
+    public void update() {
+         if (target != null) move(target.getX(), target.getY());
     }
-
 }

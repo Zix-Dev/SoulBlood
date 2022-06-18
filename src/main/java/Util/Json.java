@@ -1,15 +1,30 @@
 package Util;
 
-import com.google.gson.*;
+import Model.Physics.Body;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
 
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Type;
 
 public abstract class Json {
 
-    public static Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    public static Gson gson;
+    static {
+        var builder = new GsonBuilder();
+        builder.setPrettyPrinting();
+        builder.registerTypeAdapter(Body.class, (JsonDeserializer<Body>) (jsonElement, type, jsonDeserializationContext)
+                -> {
+            var b = jsonElement.getAsJsonObject();
+            return new Body(b.get("x").getAsFloat(),
+                    b.get("y").getAsFloat(),
+                    b.get("width").getAsFloat(),
+                    b.get("height").getAsFloat());});
+        gson = builder.create();
+    }
+
 
     public static <T> T read(String path, Class<T> type) {
         T object = null;
