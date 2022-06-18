@@ -24,7 +24,8 @@ import static java.awt.event.KeyEvent.*;
 
 /*
  * Todo:
- *  -Body Collisions
+ *  - Check collision on gameobject
+ *  - Call other object on collide
  *  -Tileset custom trimmer
  *  -Tileset collision box definition
  *  -Design assets

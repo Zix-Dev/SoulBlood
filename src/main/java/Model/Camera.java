@@ -56,7 +56,7 @@ public class Camera {
         return limits;
     }
 
-    public void move(float x, float y)  {
+    public void moveTo(float x, float y)  {
         x -= width/2;
         y -= height/2;
         if (limits[LEFT] != null && x < limits[LEFT]) x = limits[LEFT];
@@ -68,6 +68,6 @@ public class Camera {
     }
 
     public void update() {
-         if (target != null) move(target.getX(), target.getY());
+         if (target != null) moveTo(target.getX(), target.getY());
     }
 }

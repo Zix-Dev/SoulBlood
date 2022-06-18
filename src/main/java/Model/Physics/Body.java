@@ -1,7 +1,5 @@
 package Model.Physics;
 
-import java.awt.geom.Rectangle2D;
-
 public class Body {
 
   private float x0, y0;
@@ -33,9 +31,22 @@ public class Body {
     this.y0 = y-height/2;
   }
 
-  public void move(float x, float y) {
+  public void moveTo(float x, float y) {
     setX(x);
     setY(y);
+  }
+
+  public void move(float deltaX, float deltaY) {
+    x0+=deltaX;
+    y0+= deltaY;
+  }
+
+  public void moveX(float deltaX) {
+    x0+=deltaX;
+  }
+
+  public void  moveY(float deltaY) {
+    y0+=deltaY;
   }
 
   public float getWidth() {
@@ -54,17 +65,26 @@ public class Body {
     this.height = height;
   }
 
-  public Rectangle2D.Float getRect() {
-    return new Rectangle2D.Float(left(), top(), width, height);
-  }
-
   public boolean collides(Body body) {
     if (body == this) return false;
-    if (left() > body.right() || body.left() > right())
-      return false;
-    if (top() > body.bottom() || body.top() > bottom())
-      return false;
-    return true;
+    return (left() < body.right())
+            && (body.left() < right())
+            && (top() < body.bottom())
+            && (body.top() < bottom());
+  }
+
+  public Collision getMovementCollision(Body body, float deltaX, float deltaY) {
+    boolean collidesVertically, collidesHorizontally;
+    Collision collision = null;
+    move(deltaX, 0);
+    collidesHorizontally = collides(body);
+    move(-deltaX, deltaY);
+    collidesVertically = collides(body);
+    move(0, -deltaY);
+    if (collidesVertically || collidesHorizontally) {
+      collision = new Collision(body, collidesVertically, collidesHorizontally);
+    }
+    return collision;
   }
 
   public float right() {
@@ -88,15 +108,26 @@ public class Body {
   }
 
   public void setLeft(float x) {
-    this.x0 = x + width;
+    this.x0 = x;
   }
 
   public void setTop(float y) {
-    this.y0 = y - height;
+    this.y0 = y;
   }
 
   public void setBottom(float y) {
-    this.y0 = y + height;
+    this.y0 = y - height;
+  }
+
+  public void approach(Collision collision) {
+    if (collision.horizontal()) {
+      if (collision.body().getX() < getX()) setLeft(collision.body().right());
+      else setRight(collision.body().left());
+    }
+    if (collision.vertical()) {
+      if (collision.body().getY() < getY()) setTop(collision.body().bottom());
+      else setBottom(collision.body().top());
+    }
   }
 
 }

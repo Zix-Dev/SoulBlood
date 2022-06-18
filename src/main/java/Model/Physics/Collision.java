@@ -1,3 +1,3 @@
 package Model.Physics;
 
-public record Collision (boolean vertical, boolean horizontal) {}
+public record Collision (Body body, boolean vertical, boolean horizontal) {}
