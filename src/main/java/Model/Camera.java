@@ -1,10 +1,12 @@
 package Model;
 
+import Model.Physics.Body;
+
 public class Camera {
 
     private float x, y;
     public final float width, height;
-    private GameObject target = null;
+    private Body target = null;
     private Float minX = null;
     private Float maxX = null;
     private Float minY = null;
@@ -26,6 +28,10 @@ public class Camera {
         this.y = posY;
     }
 
+    public float getWidth() {
+        return width;
+    }
+
     public void setLimits(float minX, float maxX, float minY, float maxY) {
         if (minX > maxX || minY > maxX) throw new IllegalArgumentException("A min can't be greater then a max");
         this.minX = minX;
@@ -38,27 +44,27 @@ public class Camera {
         return new float[]{minX, maxX, minY, maxY};
     }
 
-    public void track(GameObject o) {
-        this.target = o;
+    public void track(Body b) {
+        this.target = b;
     }
 
     public void stopTracking() {
         this.target = null;
     }
 
-    public GameObject getTrackTarget() {
+    public Body getTrackTarget() {
         return target;
     }
 
     public float x() {
-        var posX = (target == null) ? x : target.body.x;
+        var posX = (target == null) ? x : target.x;
         if (minX != null && posX < minX) posX = minX;
         else if (maxX != null && posX > maxX) posX = maxX;
         return posX;
     }
 
     public float y() {
-        var posY = (target == null) ? y : target.body.y;
+        var posY = (target == null) ? y : target.y;
         if (minY != null && posY < minY) posY = minY;
         else if (maxY != null && posY > maxY) posY = maxY;
         return posY;

@@ -1,14 +1,8 @@
 package Model;
 
-import Controller.KeyInput;
-import Model.Physics.Body;
-
-import static java.awt.event.KeyEvent.*;
-import static java.awt.event.KeyEvent.VK_S;
-
 public class Player extends GameObject {
 
-    public Player(Body body) {
+    public Player(Model.Physics.Body body) {
         super(body);
     }
 

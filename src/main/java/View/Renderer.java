@@ -1,6 +1,7 @@
 package View;
 
 import Graphics.Sprite.Sprite;
+import Graphics.ParallaxBackground;
 import Model.Camera;
 import Model.Level;
 import Graphics.TileSet;
@@ -15,9 +16,10 @@ public class Renderer extends Canvas {
     public Level level;
     public TileSet tileSet;
     public final Camera camera = new Camera(17, 10);
-    boolean renderColliders = false;
-    boolean renderMapCoordinates = false;
-    boolean renderCamera = false;
+    private boolean renderColliders = false;
+    private boolean renderMapCoordinates = false;
+    private boolean renderCamera = false;
+    public ParallaxBackground parallaxBackground = null;
     private float scale = 1.75f;
     private Graphics2D g;
 
@@ -62,6 +64,7 @@ public class Renderer extends Canvas {
         this.setSize((int) (camera.width * scale * tileSet.size), (int) (camera.height * scale * tileSet.size));
         g = getGraphics();
         fill(Color.DARK_GRAY);
+        if (parallaxBackground != null) renderBackground();
         renderMap();
         renderObjects();
         if (renderMapCoordinates) renderMapCoordinates();
@@ -78,6 +81,11 @@ public class Renderer extends Canvas {
     }
 
     //Render methods
+
+    private void renderBackground() {
+        parallaxBackground.setPosition(camera.x(), camera.y());
+        g.drawImage(parallaxBackground,0,0, (int) relSize(camera.width), (int) relSize(camera.height), null);
+    }
 
     private void renderObjects() {
         for (var o : level.getAllObjects()) {

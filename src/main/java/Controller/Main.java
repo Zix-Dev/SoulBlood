@@ -1,7 +1,9 @@
 package Controller;
 
+import Graphics.Sprite.Sprite;
+import Graphics.Sprite.SpriteSheet;
 import Graphics.TileSet;
-import Model.GameObject;
+import Graphics.ParallaxBackground;
 import Model.GameObject.Input;
 import Model.Level;
 import Model.Physics.Body;
@@ -10,15 +12,18 @@ import Model.TileMap;
 import Util.Json;
 import View.Renderer;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 
 import static java.awt.event.KeyEvent.*;
-import static java.lang.Thread.sleep;
 
 /*
  * Todo:
- *  -Body Collisions and shapes --> #Test it
+ *  -Body Collisions
  *  -Tileset custom trimmer
  *  -Tileset collision box definition
  *  -Implement with parallax
@@ -43,8 +48,15 @@ public abstract class Main {
         testLevel.add(player);
         TileSet tileSet = new TileSet("src/main/resources/Assets/TileSets/test.png", 32);
         renderer = new Renderer(testLevel, tileSet);
-        renderer.camera.track(player);
+        renderer.camera.track(player.body);
         renderer.addKeyListener(keyInput);
+        Sprite[] parallaxLayers = null;
+        try {
+            parallaxLayers = new SpriteSheet(ImageIO.read(new File("src/main/resources/Assets/Backgrounds/BlueMountains.png")), 500, 500).getSpriteArray();
+        } catch (IOException ignored) {}
+        assert parallaxLayers != null;
+        renderer.camera.setLimits(0,tileMap.width, 0, tileMap.height);
+        renderer.parallaxBackground = new ParallaxBackground(parallaxLayers[0], Arrays.copyOfRange(parallaxLayers, 1, 5), new float[]{0.7f,0.4f,0.2f,0.1f});
         window.add(renderer);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.getContentPane().setBackground(Color.BLACK);
