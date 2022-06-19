@@ -24,26 +24,29 @@ import static java.awt.event.KeyEvent.*;
 
 /*
  * Todo:
- *  - Check collision on gameobject
+ *  - Check collision on game object
  *  - Call other object on collide
  *  -Tileset custom trimmer
  *  -Tileset collision box definition
- *  -Design assets
+ *  -Calculate viewport scale
+ *  -Debug keys
  */
 public abstract class Main {
 
     public static JFrame window = new JFrame("SoulBlood");
     public static Level testLevel;
     public static Player player;
-    public static Camera camera = new Camera(18,10);
+    public static Camera camera = new Camera(18, 10);
     public static Renderer renderer;
     public static KeyInput keyInput = new KeyInput();
     public static Input playerInput = new Input();
+
     static {
         System.setProperty("sun.awt.noerasebackground", "true");
         TileMap tileMap = Json.read("src/main/resources/Maps/Test/Test.json", TileMap.class);
         testLevel = new Level(tileMap, camera);
-        player = new Player(new Body(0.5f, 0.5f, 1, 1));
+        testLevel.setLimits(-5, tileMap.width + 5, -5, tileMap.height + 5);
+        player = new Player(new Body(0.5f, 0.5f, 0.8f, 0.8f));
         player.input = playerInput;
         testLevel.add(player);
         TileSet tileSet = new TileSet("src/main/resources/Assets/TileSets/test.png", 32);
@@ -52,26 +55,47 @@ public abstract class Main {
         renderer.addKeyListener(keyInput);
         Sprite[] parallaxLayers = null;
         try {
-            parallaxLayers = new SpriteSheet(ImageIO.read(new File("src/main/resources/Assets/Backgrounds/BlueMountains.png")), 500, 500).getSpriteArray();
-        } catch (IOException ignored) {}
+            parallaxLayers = new SpriteSheet(ImageIO.read(new File("src/main/resources/Assets/Backgrounds/SunsetMountains.png")), 500, 500).getSpriteArray();
+        } catch (IOException ignored) {
+        }
         assert parallaxLayers != null;
-        //renderer.camera.setLimits(0,tileMap.height, 0, tileMap.width);
-        renderer.parallaxBackground = new ParallaxBackground(parallaxLayers[0], Arrays.copyOfRange(parallaxLayers, 1, 5), new float[]{0.7f,0.4f,0.2f,0.1f});
+        renderer.camera.setLimits(0, tileMap.height, 0, tileMap.width);
+        renderer.parallaxBackground = new ParallaxBackground(parallaxLayers[0], Arrays.copyOfRange(parallaxLayers, 1, 6), new float[]{1.1f, 0.7f, 0.4f, 0.2f, 0.1f});
         window.add(renderer);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.getContentPane().setBackground(Color.BLACK);
+        window.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        window.setUndecorated(true);
         window.setVisible(true);
-        window.setSize((int) (renderer.camera.width * 58), (int) (renderer.camera.height * 58));
+
     }
 
     public static void main(String[] args) throws Exception {
+        long lastCheck = 0;
+        int ups = 0, fps = 0;
+        renderer.requestFocus();
         while (true) {
             playerInput.up = keyInput.get(VK_W);
             playerInput.down = keyInput.get(VK_S);
             playerInput.right = keyInput.get(VK_A);
             playerInput.left = keyInput.get(VK_D);
             testLevel.update();
+            ups++;
             renderer.render();
+            fps++;
+            if (System.currentTimeMillis() - lastCheck > 1000) {
+                Graphics g = renderer.ratesCard.getGraphics();
+                g.setColor(Color.BLACK);
+                g.fillRect(0,0 ,80,45);
+                g.setColor(Color.WHITE);
+                g.drawString("UPS: "+ups, 10,15);
+                g.drawString("FPS: " + fps, 10, 35);
+                g.dispose();
+                ups = 0; fps = 0;
+                lastCheck = System.currentTimeMillis();
+                System.out.println("he");
+            }
+
         }
     }
 }

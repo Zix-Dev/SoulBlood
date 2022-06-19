@@ -3,8 +3,7 @@ package Model;
 import Model.Physics.Body;
 import Model.Physics.Collision;
 
-import static Model.GameConstants.APPROACH;
-import static Model.GameConstants.NONE;
+import static Model.GameConstants.*;
 
 public class GameObject {
 
@@ -36,25 +35,32 @@ public class GameObject {
         }
     }
 
-    public void moveTo(float nextX, float nextY) {
-
-    }
-
     public void move(float deltaX, float deltaY) {
+        boolean h = false, v = false;
+        if (levelContext.limits[LEFT] != null && body.left() + deltaX < levelContext.limits[LEFT]) h = true;
+        if (levelContext.limits[RIGHT] != null && body.right() + deltaX > levelContext.limits[RIGHT]) h = true;
+        if (levelContext.limits[TOP] != null && body.top() + deltaY < levelContext.limits[TOP]) v = true;
+        if (levelContext.limits[BOTTOM] != null && body.bottom() + deltaY > levelContext.limits[BOTTOM]) v = true;
         var collisions = levelContext.getMovementCollisions(body, deltaX, deltaY);
-        if (collisions.isEmpty()) {
+        if (collisions.isEmpty() && !h && !v) {
             body.move(deltaX, deltaY);
             return;
         }
-        boolean h = true, w = true;
         Collision collision;
         while (!collisions.isEmpty()) {
             collision = collisions.poll();
-            if (!collision.horizontal()) h = false;
-            if (!collision.vertical()) w = false;
+            if (collision.horizontal()) h = true;
+            if (collision.vertical()) v = true;
             onCollide(collision);
         }
-        if (w) body.moveX(deltaX);
-        if (h) body.moveY(deltaY);
+        if ((levelContext.limits[LEFT] != null && body.left() + deltaX < levelContext.limits[LEFT])
+                || (levelContext.limits[RIGHT] != null && body.right() + deltaX > levelContext.limits[RIGHT]))
+            h = true;
+        if ((levelContext.limits[TOP] != null && body.top() + deltaY < levelContext.limits[TOP])
+                || (levelContext.limits[BOTTOM] != null && body.bottom() + deltaY > levelContext.limits[BOTTOM]))
+            v = true;
+
+        if (!h) body.moveX(deltaX);
+        if (!v) body.moveY(deltaY);
     }
 }

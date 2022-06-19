@@ -6,10 +6,13 @@ import Model.Physics.Collision;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import static Model.GameConstants.*;
+
 public class Level {
 
     public TileMap map;
     public final Camera camera;
+    public final Float[] limits = new Float[4];
     private final LinkedList<GameObject> objects = new LinkedList<>();
     private final Queue<GameObject> addQueue = new LinkedList<>();
     private final Queue<GameObject> removeQueue = new LinkedList<>();
@@ -24,6 +27,14 @@ public class Level {
         while (!removeQueue.isEmpty()) objects.remove(removeQueue.poll());
         while (!addQueue.isEmpty()) objects.add(addQueue.poll());
         camera.update();
+    }
+
+    public void setLimits(float left, float right, float top, float bottom) {
+        if (left > right || top > bottom) throw new IllegalArgumentException();
+        limits[LEFT] = left;
+        limits[RIGHT] = right;
+        limits[TOP] = top;
+        limits[BOTTOM] = bottom;
     }
 
     public void add(GameObject o) {

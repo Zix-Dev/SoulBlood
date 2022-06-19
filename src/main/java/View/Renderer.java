@@ -8,6 +8,7 @@ import GraphicObjects.TileSet;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
 
 public class Renderer extends Canvas {
 
@@ -15,10 +16,12 @@ public class Renderer extends Canvas {
 
     public Level level;
     public TileSet tileSet;
+    public BufferedImage ratesCard = new BufferedImage(100, 50, BufferedImage.TYPE_INT_ARGB);
     public final Camera camera;
     private boolean renderColliders = true;
-    private boolean renderMapCoordinates = false;
+    private boolean renderMapCoordinates = true;
     private boolean renderCamera = false;
+    private boolean renderRates = true;
     public ParallaxBackground parallaxBackground = null;
     private float scale = 1.75f;
     private Graphics2D g;
@@ -74,11 +77,16 @@ public class Renderer extends Canvas {
             renderObjectColliders();
         }
         if (renderCamera) renderCamera();
+        if (renderRates && ratesCard != null) renderRates();
         g.dispose();
         try {
             getBufferStrategy().show();
         } catch (Exception ignored) {
         }
+    }
+
+    private void renderRates() {
+        g.drawImage(ratesCard, 0, 0, null);
     }
 
     //Render methods
@@ -155,7 +163,7 @@ public class Renderer extends Canvas {
     }
 
     public void drawTile(int tile, float x, float y) {
-        g.drawImage(tileSet.tiles[tile], (int) relX(x), (int) relY(y), (int) (tileSet.size * scale), (int) (tileSet.size * scale), null);
+        g.drawImage(tileSet.tiles[tile], (int) relX(x), (int) relY(y), (int) (relSize(1)), (int) (relSize(1)), null);
     }
 
     public void drawRect(float x, float y, float w, float h) {
