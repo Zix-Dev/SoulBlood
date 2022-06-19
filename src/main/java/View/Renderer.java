@@ -1,12 +1,14 @@
 package View;
 
-import GraphicObjects.Sprite.Sprite;
 import GraphicObjects.ParallaxBackground;
+import GraphicObjects.Sprite.Sprite;
+import GraphicObjects.TileSet;
 import Model.Camera;
 import Model.Level;
-import GraphicObjects.TileSet;
 
 import java.awt.*;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 
@@ -20,7 +22,7 @@ public class Renderer extends Canvas {
     public final Camera camera;
     private boolean renderColliders = true;
     private boolean renderMapCoordinates = true;
-    private boolean renderCamera = false;
+    private boolean renderCamera = true;
     private boolean renderRates = true;
     public ParallaxBackground parallaxBackground = null;
     private float scale = 1.75f;
@@ -32,6 +34,27 @@ public class Renderer extends Canvas {
         this.level = level;
         this.tileSet = tileSet;
         this.camera = camera;
+        addComponentListener(new ComponentListener() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                adaptScale();
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                adaptScale();
+            }
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+                adaptScale();
+            }
+
+            @Override
+            public void componentHidden(ComponentEvent e) {
+                adaptScale();
+            }
+        });
     }
 
     //Overriden Mehods
@@ -60,6 +83,11 @@ public class Renderer extends Canvas {
         } catch (Exception ignored) {
             return getGraphics();
         }
+    }
+
+    private void adaptScale() {
+        int w = getWidth(), h = getHeight();
+        scale = w / (camera.width * tileSet.size);
     }
 
     //Render

@@ -29,7 +29,7 @@ import static java.awt.event.KeyEvent.*;
  *  -Tileset custom trimmer
  *  -Tileset collision box definition
  *  -Calculate viewport scale
- *  -Debug keys
+ *  -Debug keys and fullscreen
  */
 public abstract class Main {
 
@@ -65,7 +65,7 @@ public abstract class Main {
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.getContentPane().setBackground(Color.BLACK);
         window.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        window.setUndecorated(true);
+        window.setUndecorated(false);
         window.setVisible(true);
 
     }
