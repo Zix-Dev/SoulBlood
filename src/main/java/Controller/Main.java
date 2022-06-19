@@ -84,8 +84,10 @@ public abstract class Main {
             renderer.render();
             fps++;
             if (System.currentTimeMillis() - lastCheck > 1000) {
-                Graphics g = renderer.ratesCard.getGraphics();
-                g.setColor(Color.BLACK);
+                var g = (Graphics2D) renderer.ratesCard.getGraphics();
+                g.setBackground(new Color(255, 255, 255, 0));
+                g.clearRect(0, 0, renderer.ratesCard.getWidth(), renderer.ratesCard.getHeight());
+                g.setColor(new Color(0,0,0,100));
                 g.fillRect(0,0 ,80,45);
                 g.setColor(Color.WHITE);
                 g.drawString("UPS: "+ups, 10,15);
@@ -93,7 +95,6 @@ public abstract class Main {
                 g.dispose();
                 ups = 0; fps = 0;
                 lastCheck = System.currentTimeMillis();
-                System.out.println("he");
             }
 
         }
