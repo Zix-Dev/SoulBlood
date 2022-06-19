@@ -67,7 +67,6 @@ public abstract class Main {
         window.setExtendedState(JFrame.MAXIMIZED_BOTH);
         window.setUndecorated(false);
         window.setVisible(true);
-
     }
 
     public static void main(String[] args) throws Exception {

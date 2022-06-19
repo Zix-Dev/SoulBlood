@@ -25,7 +25,7 @@ public class Renderer extends Canvas {
     private boolean renderCamera = true;
     private boolean renderRates = true;
     public ParallaxBackground parallaxBackground = null;
-    private float scale = 1.75f;
+    private float scale = 1f;
     private Graphics2D g;
 
     //Constructor
@@ -87,13 +87,18 @@ public class Renderer extends Canvas {
 
     private void adaptScale() {
         int w = getWidth(), h = getHeight();
-        scale = w / (camera.width * tileSet.size);
+        float sX = w / camera.width;
+        float sY = h / camera.height;
+        scale = Math.min(sX, sY);
+        var d = new Dimension((int) (scale * camera.width), (int) (scale * camera.height));
+        setMaximumSize(d);
+        setPreferredSize(d);
+        setSize(d);
     }
 
     //Render
 
     public void render() {
-        this.setSize((int) (camera.width * scale * tileSet.size), (int) (camera.height * scale * tileSet.size));
         g = getGraphics();
         fill(Color.DARK_GRAY);
         if (parallaxBackground != null) renderBackground();
@@ -133,17 +138,18 @@ public class Renderer extends Canvas {
     private void renderCamera() {
         g.setColor(Color.blue);
         g.setStroke(new BasicStroke(5));
-        var s = scale * tileSet.size;
-        g.drawRect(0, 0, (int) (camera.width * s) - 1, (int) (camera.height * s) - 1);
+        g.drawRect(0, 0, (int) (camera.width * scale) - 1, (int) (camera.height * scale) - 1);
         g.setStroke(new BasicStroke(1));
-        g.drawLine((int) (camera.width / 2 * s + s / 7), (int) (camera.height / 2 * s), (int) (camera.width / 2 * s - s / 7), (int) (camera.height / 2 * s));
-        g.drawLine((int) (camera.width / 2 * s), (int) (camera.height / 2 * s + s / 7), (int) (camera.width / 2 * s), (int) (camera.height / 2 * s - s / 7));
+        g.drawLine((int) (camera.width / 2 * scale + scale / 7), (int) (camera.height / 2 * scale),
+                (int) (camera.width / 2 * scale - scale / 7), (int) (camera.height / 2 * scale));
+        g.drawLine((int) (camera.width / 2 * scale), (int) (camera.height / 2 * scale + scale / 7),
+                (int) (camera.width / 2 * scale), (int) (camera.height / 2 * scale - scale / 7));
     }
 
     private void renderMap() {
         int tile;
-        for (int x = 0; x < level.map.width; x++) {
-            for (int y = 0; y < level.map.height; y++) {
+        for (int x = 0; x < level.map.width && x < camera.right(); x++) {
+            for (int y = 0; y < level.map.height && y < camera.bottom(); y++) {
                 for (int z = 0; z < level.map.layerCount; z++) {
                     tile = level.map.layers[z][y][x];
                     if (tile < 0) continue;
@@ -155,14 +161,14 @@ public class Renderer extends Canvas {
 
     private void renderMapCoordinates() {
         g.setColor(new Color(50, 110, 50));
-        for (int x = 0; x < level.map.width; x++) {
+        for (int x = 0; x < level.map.width && x < camera.right(); x++) {
             drawLine(x, 0, x, level.map.height);
-            for (int y = 0; y < level.map.height; y++) {
-                g.drawString(x + ", " + y, relX(x) + scale * 2, relY(y) + scale * 8);
+            for (int y = 0; y < level.map.height && y < camera.bottom(); y++) {
+                g.drawString(x + ", " + y, relX(x) + 3, relY(y) + 12);
             }
         }
-        for (int x = 0; x < level.map.width + 1; x++) drawLine(x, 0, x, level.map.height);
-        for (int y = 0; y < level.map.height + 1; y++) drawLine(0, y, level.map.width, y);
+        for (int x = 0; x < level.map.width + 1 && x < camera.right(); x++) drawLine(x, 0, x, level.map.height);
+        for (int y = 0; y < level.map.height + 1 && y < camera.bottom(); y++) drawLine(0, y, level.map.width, y);
     }
 
     public void renderObjectColliders() {
@@ -187,7 +193,7 @@ public class Renderer extends Canvas {
     }
 
     public void drawImage(Sprite sprite, float x, float y) {
-        g.drawImage(sprite, (int) (relX(x) - relSize(0.5f)), (int) (relY(y) - relSize(0.5f)), (int) (sprite.width * scale), (int) (sprite.height * scale), null);
+        g.drawImage(sprite, (int) (relX(x) - relSize(0.5f)), (int) (relY(y) - relSize(0.5f)), (int) (sprite.width / tileSet.size * scale), (int) (sprite.height / tileSet.size * scale), null);
     }
 
     public void drawTile(int tile, float x, float y) {
@@ -211,15 +217,15 @@ public class Renderer extends Canvas {
     //Relative units parsers
 
     private float relX(float x) {
-        return ((x - camera.left()) * scale * tileSet.size);
+        return ((x - camera.left()) * scale);
     }
 
     private float relY(float y) {
-        return ((y - camera.top()) * scale * tileSet.size);
+        return ((y - camera.top()) * scale);
     }
 
     private float relSize(float w) {
-        return w * scale * tileSet.size;
+        return w * scale+1f;
     }
 
 }
