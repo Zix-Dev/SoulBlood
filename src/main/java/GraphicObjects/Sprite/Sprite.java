@@ -15,6 +15,10 @@ public class Sprite extends BufferedImage {
         copy(bi);
     }
 
+    public Sprite(int w, int h, int type) {
+        this(new BufferedImage(w, h, type));
+    }
+
     //Methods
 
     public void copy(BufferedImage bi) {
@@ -36,6 +40,14 @@ public class Sprite extends BufferedImage {
                 i++;
             }
         return sprites;
+    }
+
+    public Sprite resize(int w, int h) {
+        var ns = new Sprite(w,h,getType());
+        var g = ns.getGraphics();
+        g.drawImage(this, 0, 0, w, h, null);
+        g.dispose();
+        return ns;
     }
 
 }

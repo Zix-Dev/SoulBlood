@@ -10,7 +10,7 @@ public class GameObject {
     public Input input = null;
     public int collisionBehaviour = NONE;
     public Body body;
-    public int sprite = 7;
+    public int sprite = 25;
     public Level levelContext = null;
 
     public GameObject(Body body) {

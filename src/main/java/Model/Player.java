@@ -19,7 +19,7 @@ public class Player extends GameObject {
             deltaY += input.down ? SPEED : 0;
             deltaX = input.right ? -SPEED : 0;
             deltaX += input.left ? SPEED : 0;
-            sprite = deltaX < 0 ? 6 : (deltaX > 0) ? 7 : sprite;
+            sprite = deltaX < 0 ? 24 : (deltaX > 0) ? 25 : sprite;
             move(deltaX, deltaY);
         }
     }

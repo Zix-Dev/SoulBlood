@@ -46,7 +46,7 @@ public abstract class Main {
         TileMap tileMap = Json.read("src/main/resources/Maps/Test/Test.json", TileMap.class);
         testLevel = new Level(tileMap, camera);
         testLevel.setLimits(-5, tileMap.width + 5, -5, tileMap.height + 5);
-        player = new Player(new Body(0.5f, 0.5f, 0.8f, 0.8f));
+        player = new Player(new Body(21.5f, 21.5f, 0.8f, 0.8f));
         player.input = playerInput;
         testLevel.add(player);
         TileSet tileSet = new TileSet("src/main/resources/Assets/TileSets/test.png", 32);
@@ -60,16 +60,24 @@ public abstract class Main {
         }
         assert parallaxLayers != null;
         renderer.camera.setLimits(0, tileMap.height, 0, tileMap.width);
-        renderer.parallaxBackground = new ParallaxBackground(parallaxLayers[0], Arrays.copyOfRange(parallaxLayers, 1, 6), new float[]{1.1f, 0.7f, 0.4f, 0.2f, 0.1f});
+        renderer.parallaxBackground = new ParallaxBackground(
+                parallaxLayers[0].resize(900, 500),
+                Arrays.copyOfRange(parallaxLayers, 1, 6),
+                new float[]{1.1f, 0.7f, 0.4f, 0.2f, 0.1f});
         window.add(renderer);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.getContentPane().setBackground(Color.BLACK);
+        window.setSize(1300, 700);
         window.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        window.setUndecorated(false);
+        window.setUndecorated(true);
         window.setVisible(true);
     }
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Press 1 to show FPS and UPS");
+        System.out.println("Press 2 to show hit boxes");
+        System.out.println("Press 3 to show coordinates");
+        System.out.println("Press 4 to show camera");
         long lastCheck = 0;
         int ups = 0, fps = 0;
         renderer.requestFocus();
@@ -94,6 +102,10 @@ public abstract class Main {
                 g.dispose();
                 ups = 0; fps = 0;
                 lastCheck = System.currentTimeMillis();
+                if (keyInput.get(VK_1)) renderer.renderRates = !renderer.renderRates;
+                if (keyInput.get(VK_2)) renderer.renderColliders = !renderer.renderColliders;
+                if (keyInput.get(VK_3)) renderer.renderMapCoordinates = !renderer.renderMapCoordinates;
+                if (keyInput.get(VK_4)) renderer.renderCamera = !renderer.renderCamera;
             }
 
         }

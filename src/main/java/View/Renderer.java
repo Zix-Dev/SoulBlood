@@ -20,10 +20,10 @@ public class Renderer extends Canvas {
     public TileSet tileSet;
     public BufferedImage ratesCard = new BufferedImage(100, 50, BufferedImage.TYPE_INT_ARGB);
     public final Camera camera;
-    private boolean renderColliders = true;
-    private boolean renderMapCoordinates = true;
-    private boolean renderCamera = true;
-    private boolean renderRates = true;
+    public boolean renderColliders = false;
+    public boolean renderMapCoordinates = false;
+    public boolean renderCamera = false;
+    public boolean renderRates = false;
     public ParallaxBackground parallaxBackground = null;
     private float scale = 1f;
     private Graphics2D g;
